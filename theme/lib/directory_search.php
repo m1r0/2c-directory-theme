@@ -23,7 +23,7 @@ class DirectorySearch {
 		$di = new DirectoryIterator($path);
 
 		foreach ($di as $fileinfo) {
-			if ($fileinfo->isDir() && !$fileinfo->isDot() && strpos($fileinfo->getFilename(), '.') === false) {
+			if ($fileinfo->isDir() && !$fileinfo->isDot() && strpos($fileinfo->getFilename(), '.') !== 0) {
 				$relative_path = preg_replace('~^' . preg_quote($this->root) . '[\/\\\]?~', '', $fileinfo->getPathName());
 
 				$relative_path = str_replace($this->root . DIRECTORY_SEPARATOR, '', $fileinfo->getPathName());
