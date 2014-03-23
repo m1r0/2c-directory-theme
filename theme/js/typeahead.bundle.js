@@ -865,7 +865,9 @@
             if (!o.node || !o.pattern) {
                 return;
             }
-            o.pattern = _.isArray(o.pattern) ? o.pattern : o.pattern.replace(/(^\s+|\s+$|(\s)\s+)/g, '$2').split(' ');
+            if (!_.isArray(o.pattern)) {
+                o.pattern = o.pattern.replace(/^\s+|\s+$|(\s)\s+/g, '$1').split(' ');
+            }
             regex = getRegex(o.pattern, o.caseSensitive, o.wordsOnly);
             traverse(o.node, hightlightTextNode);
             function hightlightTextNode(textNode) {

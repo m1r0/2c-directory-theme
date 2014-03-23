@@ -51,6 +51,11 @@ table tr:hover td { background: #eee; }
 
 .link-close { display: block; font-size: .75em; line-height: 2.5; background: #eee; color: #333; text-align: center; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
 
+.small body { font-size: 14px; }
+.small a { font-size: 1em; }
+.small .link-close { font-size: .75em; }
+.large body { font-size: 18px; }
+
 /* Dark style */
 
 .dark body { background: #222; color: #bbb; }
@@ -75,11 +80,6 @@ table tr:hover td { background: #eee; }
 .dark .tt-suggestion.tt-cursor { background-color: #222;  }
 .dark .tt-suggestion strong { color: #ff3333; }
 .dark .tt-suggestion + .tt-suggestion { border-top: 1px solid #333; }
-
-.small body { font-size: 14px; }
-.small a { font-size: 1em; }
-.small .link-close { font-size: .75em; }
-.large body { font-size: 18px; }
 
 @media screen and (max-width: 768px) {
 	.typeahead,

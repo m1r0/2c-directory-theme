@@ -1,4 +1,11 @@
 #
+# 	//////////////////////////////////////////////////////////
+# 	//														//
+# 	// 	If your directory is http://website.com/projects/ 	//
+# 	// 	you need to change the paths to: /projects/theme 	//
+# 	//														//
+# 	//////////////////////////////////////////////////////////
+#
 
 	# ENABLE INDEXING
 	Options +Indexes
@@ -11,14 +18,6 @@
 
 #
 # GENERAL ICONS (BLANK, DIRECTORY, PARENT DIRECTORY)
-#
-
-#
-# Replace {FOLDERNAME} with your directory URL eg:
-# If your directory is http://mywebsite.com/share/
-# you would change to:
-#
-# AddIcon /share/theme/icons/blank.png ^^BLANKICON^^
 #
 
 	AddIcon /theme/icons/blank.png ^^BLANKICON^^

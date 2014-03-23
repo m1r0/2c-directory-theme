@@ -1,18 +1,22 @@
 jQuery(function($) {
 
 	var	settings = {
+		// Set the root relative path
+		// Examples: '/' (default) 	=> 	http://website.com/ 
+		// 			 '/projects/' 	=> 	http://website.com/projects/
+		// * Note that the paths have to be changed in the .htaccess and header.html files also
+		root: '/',
 		color: 'light',
 		font: 'medium',
-		depth: 2
+		depth: 1
 	};
 
 	var $html = document.getElementsByTagName('html')[0],
-		$head = document.getElementsByTagName('head')[0],
-		$modal = $('.modal'),
 		$search = $('.search'),
 		$search_input = $('.typeahead'),
+		has_storage = supports_html5_storage(),
 		html_class = settings.color + ' ' + settings.font,
-		has_storage = supports_html5_storage();
+		inner_path = document.location.pathname.substring(settings.root.length);
 
 	function typeAheadInit() {
 		var search_data = new Bloodhound({
@@ -22,7 +26,7 @@ jQuery(function($) {
 			limit: 15,
 			// fetch data
 			prefetch: {
-				url: '/theme/lib/directory_search.php',
+				url: settings.root + 'theme/lib/directory_search.php',
 				// remove cache (time to live)
 				ttl: 0,
 				// the json response contains an array of strings, but the Bloodhound
@@ -32,8 +36,9 @@ jQuery(function($) {
 				},
 				ajax: {
 					data: {
-						path: document.location.pathname,
-						depth: settings.depth
+						depth: settings.depth,
+						root: settings.root,
+						path: document.location.pathname
 					},
 					success: function() {
 						$search.removeClass('loading');
@@ -44,35 +49,34 @@ jQuery(function($) {
 				}
 			},
 			sorter: function(a, b) {
-				var search_value = $search_input.val(),
-					path = document.location.pathname.substring(1),
+				var search_value,
 					dirs_a,
 					dirs_b,
 					pos_a,
 					pos_b;
 
 				// sort by path
-				if (path) {
-					if (a.name.indexOf(path) == 0 && b.name.indexOf(path) == 0) {
+				if (inner_path) {
+					if (a.name.indexOf(inner_path) == 0 && b.name.indexOf(inner_path) == 0) {
 						// continue
-					} else if(a.name.indexOf(path) == 0) {
+					} else if(a.name.indexOf(inner_path) == 0) {
 						return -1;
-					} else if(b.name.indexOf(path) == 0) {
+					} else if(b.name.indexOf(inner_path) == 0) {
 						return 1;
 					}
 				}
 
-				dirs_a = a.name.split('/');
-				dirs_b = b.name.split('/');
+				dirs_a = a.name.substring(0, a.name.length-1).split('/');
+				dirs_b = b.name.substring(0, b.name.length-1).split('/');
 
-				// sort by dirs count
+				// sort by dir count
 				if (dirs_a.length < dirs_b.length)
 					return -1;
 
 				if (dirs_a.length > dirs_b.length)
 					return 1;
 
-				// sort by dir names
+				// sort by dir name
 				if (dirs_a < dirs_b)
 					return -1;
 
@@ -80,6 +84,7 @@ jQuery(function($) {
 					return 1;
 
 				// sort by string position
+				search_value = $search_input.val();
 				pos_a = a.name.indexOf(search_value);
 				pos_b = b.name.indexOf(search_value);
 
@@ -117,12 +122,13 @@ jQuery(function($) {
 		$search_input
 			// Redirect on select
 			.on('typeahead:selected', function(e){
-				window.location.href = 'http://' + document.location.host + '/' + e.target.value;
+				window.location.href = 'http://' + document.location.host + settings.root + e.target.value;
+				$search.addClass('loading');
 			})
 			// Select first suggestion by pressing tab
 			.on('keydown', function(e) {
 				if (e.keyCode == 9) {
-					var $first_suggestion = $('.tt-suggestion').filter(':first'),
+					var $first_suggestion = $('.tt-suggestion').first(),
 						first_value = $first_suggestion.length ? $first_suggestion.text() : '',
 						current_value = $search_input.val();
 
@@ -236,7 +242,6 @@ jQuery(function($) {
 			for (var option in settings) {
 				if(readCookie('2c_theme_' + option) != settings[option]) {
 					eraseCookie('2c_theme_' + option);
-
 					createCookie('2c_theme_' + option, settings[option], 99999);
 				}
 			}
@@ -287,20 +292,21 @@ jQuery(function($) {
 	serverLinksGenerator();
 
 	// Add tabindex to rows
-	$('.wrapper table tr').filter(':not(:first)').each(function(i) {
+	$('.wrapper table tr').slice(1).each(function(i) {
 		var $self = $(this);
 
 		$(this).find('a')
 			.attr('tabindex', i+2)
-			.on('focus', function() {
-				$self.addClass('active');
-			})
-			.on('blur', function() {
-				$self.removeClass('active');
-			});
+			.on('focus', function() { $self.addClass('active'); })
+			.on('blur', function() {  $self.removeClass('active'); });
 	});
 
 	$('.settings a').on('click', function(e) {
+		e.preventDefault();
+
+		if ($(this).hasClass('active'))
+			return;
+
 		var option = $(this).closest('.settings').data('option'),
 			value = $(this).data('value');
 
@@ -310,12 +316,10 @@ jQuery(function($) {
 
 		if (option == 'depth')
 			typeAheadInit();
-
-		e.preventDefault();
 	});
 
 	$('.link-settings, .link-close').on('click', function(e) {
-		$modal.toggleClass('modal-open');
+		$('.modal').toggleClass('modal-open');
 
 		e.preventDefault();
 	});

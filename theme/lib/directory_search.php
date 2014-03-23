@@ -1,70 +1,76 @@
 <?php
 
 class DirectorySearch {
-	private $results = array();
+	private $dirs = array();
+	private $inner_path = false;
 	private $root;
 
-	function __construct($depth = 0, $relative_path = '/') {
-		$this->root = $_SERVER['DOCUMENT_ROOT'];
+	function __construct($root_path = '/', $inner_path = false, $depth = 0) {
+		$this->root = $_SERVER['DOCUMENT_ROOT'] . $root_path;
 
-		$root_dirs = $this->get_directories($this->root, $depth);
-		$path_dirs = $this->get_relative_directories($relative_path, $depth);
+		if ($inner_path && $inner_path != $root_path) {
+			$this->inner_path = ltrim($inner_path, $root_path);
 
-		if ($path_pos = array_search(ltrim($relative_path, '/'), $root_dirs)) {
-			unset($root_dirs[$path_pos]);
+			// Get inner (current) path directories
+			$this->get_directories($this->root . $this->inner_path, $depth);
 		}
 
-		$this->results = array_merge($path_dirs, $root_dirs);
+		// Get root directories
+		$this->get_directories($this->root, $depth);
 	}
 
 	function get_directories($path, $depth) {
-		$dirs = array();
+		if ($handler = opendir($path)) {
+			while (false !== ($file = readdir($handler))) {
+				if ($file == '.' || $file == '..' || !is_dir($path . $file))
+					continue;
 
-		$di = new DirectoryIterator($path);
+				$dirpath = $path . $file . '/';
 
-		foreach ($di as $fileinfo) {
-			if ($fileinfo->isDir() && !$fileinfo->isDot() && strpos($fileinfo->getFilename(), '.') !== 0) {
-				$relative_path = preg_replace('~^' . preg_quote($this->root) . '[\/\\\]?~', '', $fileinfo->getPathName());
+				$this->dirs[] = $dirpath;
 
-				$relative_path = str_replace($this->root . DIRECTORY_SEPARATOR, '', $fileinfo->getPathName());
-
-				$dirs[] = str_replace('\\', '/', $relative_path) . '/';
-
-				if ($depth) {
-					$sub_dirs = $this->get_directories($fileinfo->getPathName(), $depth - 1);
-
-					foreach ($sub_dirs as $d) {
-						$dirs[] = $d;
-					}
-				}
+				if ($depth)
+					$this->get_directories($dirpath, $depth-1);
 			}
 		}
-
-		return $dirs;
 	}
 
-	function get_relative_directories($path, $depth) {
-		$dirs = array();
+	function process_dirs() {
+		$relative_dirs = array();
 
-		if ($path != '/' && is_dir($this->root . $path)) {
-			$dirs = $this->get_directories($this->root . $path, $depth);
+		$this->dirs = array_unique($this->dirs);
+
+		foreach ($this->dirs as $dir) {
+			$dir = ltrim($dir, $this->root);
+
+			if (DIRECTORY_SEPARATOR == '\\')
+				$dir = str_replace('\\', '/', $dir);
+
+			$relative_dirs[] = $dir;
 		}
 
-		return $dirs;
+		return array_filter($relative_dirs, array($this, 'filter'));
+	}
+
+	function filter($dir) {
+		// Remove inner path from the results
+		if ($dir == $this->inner_path)
+			return false;
+
+		// Remove theme from the results
+		return strpos($dir, 'theme/') !== 0;
 	}
 
 	function get_results() {
-		$results = array_unique(array_filter($this->results));
-
-		return $results;
+		return $this->process_dirs();
 	}
 }
 
-$depth = isset($_GET['depth']) ? (int) $_GET['depth'] : 0;
-$path = isset($_GET['path']) ? $_GET['path'] : '/';
+$depth 	= !empty($_GET['depth']) ? (int) $_GET['depth'] : 1;	// Directory search depth
+$root	= !empty($_GET['root']) ? $_GET['root'] : '/'; 			// Relative root path
+$path	= !empty($_GET['path']) ? $_GET['path'] : '/'; 			// Relative inner path
 
-$directory_search = new DirectorySearch($depth, $path);
-
+$directory_search = new DirectorySearch($root, $path, $depth);
 $directories = $directory_search->get_results();
 
 echo json_encode($directories);
