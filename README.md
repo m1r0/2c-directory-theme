@@ -1,7 +1,7 @@
 ##Features
 
 * Directory search
-* Multiple settings for font size and theme color
+* Multiple settings for search depth, font size and theme color
 * Make your own customizations with CSS/Javascript/jQuery
 
 ##Requirements
