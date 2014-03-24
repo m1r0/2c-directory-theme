@@ -22,7 +22,7 @@ class DirectorySearch {
 	function get_directories($path, $depth) {
 		if ($handler = opendir($path)) {
 			while (false !== ($file = readdir($handler))) {
-				if ($file == '.' || $file == '..' || !is_dir($path . $file))
+				if ($file[0] === '.' || !is_dir($path . $file))
 					continue;
 
 				$dirpath = $path . $file . '/';
