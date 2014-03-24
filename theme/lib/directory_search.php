@@ -41,7 +41,7 @@ class DirectorySearch {
 		$this->dirs = array_unique($this->dirs);
 
 		foreach ($this->dirs as $dir) {
-			$dir = ltrim($dir, $this->root);
+			$dir = str_replace($this->root, '', $dir);
 
 			if (DIRECTORY_SEPARATOR == '\\')
 				$dir = str_replace('\\', '/', $dir);
@@ -58,7 +58,10 @@ class DirectorySearch {
 			return false;
 
 		// Remove theme from the results
-		return strpos($dir, 'theme/') !== 0;
+		if (strpos($dir, 'theme/') === 0)
+			return false;
+
+		return true;
 	}
 
 	function get_results() {
@@ -66,7 +69,7 @@ class DirectorySearch {
 	}
 }
 
-$depth 	= !empty($_GET['depth']) ? (int) $_GET['depth'] : 1;	// Directory search depth
+$depth 	= !empty($_GET['depth']) ? (int) $_GET['depth'] : 0;	// Directory search depth
 $root	= !empty($_GET['root']) ? $_GET['root'] : '/'; 			// Relative root path
 $path	= !empty($_GET['path']) ? $_GET['path'] : '/'; 			// Relative inner path
 
