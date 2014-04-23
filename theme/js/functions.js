@@ -8,12 +8,13 @@ jQuery(function($) {
 		root: '/',
 		color: 'light',
 		font: 'medium',
-		depth: 1
+		depth: 2
 	};
 
 	var $html = document.getElementsByTagName('html')[0],
 		$search = $('.search'),
 		$search_input = $('.typeahead'),
+		excluded_options = ['root'],
 		has_storage = supports_html5_storage(),
 		html_class = settings.color + ' ' + settings.font,
 		inner_path = document.location.pathname.substring(settings.root.length);
@@ -231,15 +232,20 @@ jQuery(function($) {
 	}
 
 	function updateTheme() {
-		
 		if(has_storage) {
 			for (var option in settings) {
+				if ($.inArray(option, excluded_options) > -1)
+					continue;
+
 				if(localStorage.getItem('2c_theme_' + option) != settings[option]) {
 					localStorage.setItem('2c_theme_' + option, settings[option]);
 				}
 			}
 		} else {
 			for (var option in settings) {
+				if ($.inArray(option, excluded_options) > -1)
+					continue;
+
 				if(readCookie('2c_theme_' + option) != settings[option]) {
 					eraseCookie('2c_theme_' + option);
 					createCookie('2c_theme_' + option, settings[option], 99999);
@@ -268,24 +274,33 @@ jQuery(function($) {
 		}
 	}
 
-	if(has_storage) {
-		for (var option in settings) {
-			if(localStorage.getItem('2c_theme_' + option) == null) {
-				localStorage.setItem('2c_theme_' + option, settings[option]);
-			} else if(localStorage.getItem('2c_theme_' + option)) {
-				settings[option] = localStorage.getItem('2c_theme_' + option);
+	function initTheme() {
+		if(has_storage) {
+			for (var option in settings) {
+				if ($.inArray(option, excluded_options) > -1)
+					continue;
+
+				if(localStorage.getItem('2c_theme_' + option) == null) {
+					localStorage.setItem('2c_theme_' + option, settings[option]);
+				} else if(localStorage.getItem('2c_theme_' + option)) {
+					settings[option] = localStorage.getItem('2c_theme_' + option);
+				}
 			}
-		}
-	} else {
-		for (var option in settings) {
-			if(readCookie('2c_theme_' + option) == undefined) {
-				createCookie('2c_theme_' + option, settings[option], 99999);
-			} else if(readCookie('2c_theme_' + option)) {
-				settings[option] = readCookie('2c_theme_' + option);
+		} else {
+			for (var option in settings) {
+				if ($.inArray(option, excluded_options) > -1)
+					continue;
+
+				if(readCookie('2c_theme_' + option) == undefined) {
+					createCookie('2c_theme_' + option, settings[option], 99999);
+				} else if(readCookie('2c_theme_' + option)) {
+					settings[option] = readCookie('2c_theme_' + option);
+				}
 			}
 		}
 	}
 
+	initTheme();
 	updateTheme();
 	typeAheadInit();
 	typeAheadEvents();
