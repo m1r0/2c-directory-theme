@@ -8,7 +8,7 @@ jQuery(function($) {
 		root: '/',
 		color: 'light',
 		font: 'medium',
-		depth: 2
+		depth: 1
 	};
 
 	var $html = document.getElementsByTagName('html')[0],
