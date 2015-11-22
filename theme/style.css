@@ -42,12 +42,11 @@ table tr:hover td { background: #eee; }
 .settings li:last-child a { border-radius: 0 4px 4px 0; }
 .settings li + li a { border-left: 1px solid #fff; }
 
-.settings.colors li { width: 135px; }
+.settings.colors li { width: 90px; }
 .settings.fonts li { width: 90px; }
 .settings.depth li { width: 67px; }
 
-.light .settings a.active { background: #555; color: #eee; cursor: default; }
-.dark .settings a.active { background: #eee; color: #222; cursor: default; }
+.settings a.active { background: #555; color: #eee; cursor: default; }
 
 .link-close { display: block; font-size: .75em; line-height: 2.5; background: #eee; color: #333; text-align: center; font-weight: bold; text-transform: uppercase; border-radius: 4px; }
 
@@ -80,6 +79,31 @@ table tr:hover td { background: #eee; }
 .dark .tt-suggestion.tt-cursor { background-color: #222;  }
 .dark .tt-suggestion strong { color: #ff3333; }
 .dark .tt-suggestion + .tt-suggestion { border-top: 1px solid #333; }
+.dark .settings a.active { background: #eee; color: #222; cursor: default; }
+
+/* Blue style */
+
+.blue body { background: #f2f7f9; color: #666; }
+.blue a { color: #222; }
+.blue table th { background: #e1edf2; }
+.blue table th a { color: #144e70; }
+.blue table td { color: #144e70; background: #e1edf2; border-color: #f2f7f9; }
+.blue table td a { color: #144e70; }
+.blue table tr.active td,
+.blue table tr:hover td { background: #f2f7f9; }
+.blue #logo { background-image: url(icons/logo-blue.png); }
+.blue .link-settings { background-image: url(icons/gear.png); }
+.blue .modal { background: #fefefe; }
+.blue .modal h2 { color: #144e70; }
+.blue .settings a { color: #144e70; background: #f2f7f9; }
+.blue .link-close { background: #f2f7f9; color: #144e70; }
+.blue .settings li + li a { border-color: #fefefe; }
+.blue .settings a.active { background: #0071b5; color: #eee; cursor: default; }
+.blue .tt-hint { color: #bbb !important; }
+.blue .tt-dropdown-menu { background-color: #f2f7f9; color: #666; border-color: #0071b5; }
+.blue .typeahead { color: #0071b5; border-color: #0071b5; }
+.blue .tt-suggestion strong { color: #0071b5; }
+.blue .tt-suggestion + .tt-suggestion { border-top: 1px solid #0071b5; }
 
 @media screen and (max-width: 768px) {
 	.typeahead,
