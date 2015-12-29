@@ -11,13 +11,13 @@ jQuery(function($) {
 		depth: 1
 	};
 
-	var $html = document.getElementsByTagName('html')[0],
-		$search = $('.search'),
-		$search_input = $('.typeahead'),
-		excluded_options = ['root'],
-		has_storage = supports_html5_storage(),
-		html_class = settings.color + ' ' + settings.font,
-		inner_path = document.location.pathname.substring(settings.root.length);
+	var $html            = document.getElementsByTagName('html')[0];
+	var $search          = $('.search');
+	var $search_input    = $('.typeahead');
+	var excluded_options = ['root'];
+	var has_storage      = supports_html5_storage();
+	var html_class       = settings.color + ' ' + settings.font;
+	var current_path     = document.location.pathname.substring(settings.root.length);
 
 	function typeAheadInit() {
 		var search_data = new Bloodhound({
@@ -27,7 +27,7 @@ jQuery(function($) {
 			limit: 15,
 			// fetch data
 			prefetch: {
-				url: settings.root + 'theme/lib/directory_search.php',
+				url: settings.root + '.theme/lib/directory-crawler.php',
 				// remove cache (time to live)
 				ttl: 0,
 				// the json response contains an array of strings, but the Bloodhound
@@ -37,9 +37,9 @@ jQuery(function($) {
 				},
 				ajax: {
 					data: {
-						depth: settings.depth,
-						root: settings.root,
-						path: document.location.pathname
+						root_path    : settings.root,
+						current_path : document.location.pathname,
+						depth        : settings.depth
 					},
 					success: function() {
 						$search.removeClass('loading');
@@ -50,19 +50,19 @@ jQuery(function($) {
 				}
 			},
 			sorter: function(a, b) {
-				var search_value,
-					dirs_a,
-					dirs_b,
-					pos_a,
-					pos_b;
+				var search_value;
+				var dirs_a;
+				var dirs_b;
+				var pos_a;
+				var pos_b;
 
 				// sort by path
-				if (inner_path) {
-					if (a.name.indexOf(inner_path) == 0 && b.name.indexOf(inner_path) == 0) {
+				if (current_path) {
+					if (a.name.indexOf(current_path) == 0 && b.name.indexOf(current_path) == 0) {
 						// continue
-					} else if(a.name.indexOf(inner_path) == 0) {
+					} else if(a.name.indexOf(current_path) == 0) {
 						return -1;
-					} else if(b.name.indexOf(inner_path) == 0) {
+					} else if(b.name.indexOf(current_path) == 0) {
 						return 1;
 					}
 				}
@@ -129,9 +129,9 @@ jQuery(function($) {
 			// Select first suggestion by pressing tab
 			.on('keydown', function(e) {
 				if (e.keyCode == 9) {
-					var $first_suggestion = $('.tt-suggestion').first(),
-						first_value = $first_suggestion.length ? $first_suggestion.text() : '',
-						current_value = $search_input.val();
+					var $first_suggestion = $('.tt-suggestion').first();
+					var first_value       = $first_suggestion.length ? $first_suggestion.text() : '';
+					var current_value     = $search_input.val();
 
 					if (first_value && first_value != current_value) {
 						$search_input.typeahead('val', first_value);
@@ -152,12 +152,13 @@ jQuery(function($) {
 
 	function serverLinksGenerator() {
 		var server_link = document.location.href.replace('http://', ''),
-			server_link = server_link.split('?'),
-			server_link = server_link[0],
-			server_link = server_link.substring(server_link.length - 1, ''),
-			server_links = server_link.split('/'),
-			server_links_count = server_links.length - 1,
-			$server_links_container = document.getElementsByTagName('th')[1];
+		    server_link = server_link.split('?'),
+		    server_link = server_link[0],
+		    server_link = server_link.substring(server_link.length - 1, '');
+
+		var server_links            = server_link.split('/');
+		var server_links_count      = server_links.length - 1;
+		var $server_links_container = document.getElementsByTagName('th')[1];
 
 		$server_links_container.innerHTML = '';
 
@@ -322,8 +323,8 @@ jQuery(function($) {
 		if ($(this).hasClass('active'))
 			return;
 
-		var option = $(this).closest('.settings').data('option'),
-			value = $(this).data('value');
+		var option = $(this).closest('.settings').data('option');
+		var value  = $(this).data('value');
 
 		settings[option] = value;
 
