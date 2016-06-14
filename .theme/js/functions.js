@@ -2,7 +2,7 @@ jQuery(function($) {
 
 	var	settings = {
 		// Set the root relative path
-		// Examples: '/' (default) 	=> 	http://website.com/ 
+		// Examples: '/' (default) 	=> 	http://website.com/
 		// 			 '/projects/' 	=> 	http://website.com/projects/
 		// * Note that the paths have to be changed in the .htaccess and header.html files also
 		root: '/',
@@ -103,10 +103,10 @@ jQuery(function($) {
 
 		// kicks off the loading/processing of `prefetch` data
 		search_data.initialize();
-		 
+
 		$search_input
 			// destroy typeahead, needed for reinitialization
-			.typeahead('destroy') 
+			.typeahead('destroy')
 			.typeahead({
 				// minLength: 1,
 				autoselect: true,
@@ -123,7 +123,7 @@ jQuery(function($) {
 		$search_input
 			// Redirect on select
 			.on('typeahead:selected', function(e){
-				window.location.href = 'http://' + document.location.host + settings.root + e.target.value;
+				window.location.href = getProtocol() + document.location.host + settings.root + e.target.value;
 				$search.addClass('loading');
 			})
 			// Select first suggestion by pressing tab
@@ -151,7 +151,7 @@ jQuery(function($) {
 	}
 
 	function serverLinksGenerator() {
-		var server_link = document.location.href.replace('http://', ''),
+		var server_link = document.location.href.replace(getProtocol(), ''),
 		    server_link = server_link.split('?'),
 		    server_link = server_link[0],
 		    server_link = server_link.substring(server_link.length - 1, '');
@@ -181,7 +181,7 @@ jQuery(function($) {
 				link_href = link_text;
 			}
 
-			link_href = 'http://' + link_href;
+			link_href = getProtocol() + link_href;
 			link_href = link_href.replace('///', '//');
 
 			$link.href = link_href;
@@ -299,6 +299,10 @@ jQuery(function($) {
 				}
 			}
 		}
+	}
+
+	function getProtocol() {
+		return document.location.href.match(/(\w+\:\/\/)/)[1];
 	}
 
 	initTheme();
